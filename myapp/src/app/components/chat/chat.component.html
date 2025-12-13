@@ -1,0 +1,113 @@
+<div class="flex flex-col h-full bg-[var(--dark-graphite)] text-white relative">
+  <!-- Top Bar / Model Selector -->
+  <div class="absolute top-4 left-4 z-10 flex gap-2">
+     <!-- Provider Selector -->
+     <select [(ngModel)]="selectedProvider" (change)="onProviderChange()" class="bg-[var(--surface-grey)] text-white text-sm rounded-lg px-3 py-1 border border-[var(--deep-obsidian)] focus:outline-none focus:border-[var(--neon-green)]">
+       <option *ngFor="let p of providers" [value]="p.provider">{{ p.name }}</option>
+     </select>
+     <!-- Model Selector -->
+     <select [(ngModel)]="selectedModel" class="bg-[var(--surface-grey)] text-white text-sm rounded-lg px-3 py-1 border border-[var(--deep-obsidian)] focus:outline-none focus:border-[var(--neon-green)]">
+       <option *ngFor="let m of currentModels" [value]="m.id">{{ m.name }}</option>
+     </select>
+  </div>
+
+  <!-- Chat Area -->
+  <div #scrollContainer class="flex-1 overflow-y-auto p-4 pt-16">
+    
+    <!-- Welcome Screen -->
+    <div *ngIf="messages.length === 0" class="h-full flex flex-col items-center justify-center max-w-3xl mx-auto">
+      <div class="w-16 h-16 rounded-full bg-[var(--surface-grey)] flex items-center justify-center mb-6 shadow-[0_0_40px_-10px_var(--neon-green)]">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-[var(--neon-green)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      </div>
+      <h1 class="text-3xl font-semibold mb-8">How can i help you today?</h1>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
+        <div *ngFor="let t of templates" (click)="useTemplate(t)" class="bg-[var(--surface-grey)] p-4 rounded-xl cursor-pointer hover:bg-[#333] transition-colors border border-transparent hover:border-[var(--muted-text)]">
+          <div class="text-2xl mb-2">{{ t.icon }}</div>
+          <h3 class="font-medium mb-1">{{ t.title }}</h3>
+          <p class="text-sm text-[var(--muted-text)]">{{ t.desc }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div *ngFor="let msg of messages" class="max-w-3xl mx-auto mb-6">
+      <!-- User Message -->
+      <div *ngIf="msg.role === 'user'" class="flex justify-end">
+        <div class="bg-[var(--surface-grey)] rounded-2xl px-5 py-3 max-w-[80%]">
+          <p class="whitespace-pre-wrap">{{ msg.content }}</p>
+        </div>
+      </div>
+
+      <!-- AI Message -->
+      <div *ngIf="msg.role === 'assistant'" class="flex gap-4">
+        <div class="w-8 h-8 rounded-full bg-[var(--neon-green)] flex-shrink-0 flex items-center justify-center">
+           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+           </svg>
+        </div>
+        <div class="flex-1">
+          <div class="prose prose-invert max-w-none" [innerHTML]="msg.content | markdown"></div>
+          
+          <!-- Follow-up Questions -->
+          <div *ngIf="msg.followUpQuestions && msg.followUpQuestions.length > 0" class="mt-4 space-y-2">
+            <p class="text-sm text-[var(--muted-text)] font-medium">Suggested follow-ups:</p>
+            <button *ngFor="let q of msg.followUpQuestions" (click)="userInput = q.question; sendMessage()" class="block w-full text-left text-sm bg-[var(--surface-grey)] hover:bg-[#333] px-4 py-2 rounded-lg transition-colors border border-[var(--deep-obsidian)]">
+              {{ q.question }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div *ngIf="isLoading" class="max-w-3xl mx-auto flex gap-4">
+       <div class="w-8 h-8 rounded-full bg-[var(--neon-green)] flex-shrink-0 flex items-center justify-center animate-pulse">
+           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+           </svg>
+        </div>
+        <div class="flex items-center">
+          <span class="text-[var(--muted-text)]">Thinking...</span>
+        </div>
+    </div>
+
+  </div>
+
+  <!-- Input Area -->
+  <div class="p-4 pb-6">
+    <div class="max-w-3xl mx-auto relative">
+      <div class="bg-[var(--surface-grey)] rounded-xl border border-[var(--deep-obsidian)] focus-within:border-[var(--muted-text)] transition-colors overflow-hidden">
+        <textarea 
+          [(ngModel)]="userInput" 
+          (keydown.enter)="$event.preventDefault(); sendMessage()"
+          placeholder="Type your prompt here..." 
+          class="w-full bg-transparent text-white px-4 py-3 focus:outline-none resize-none h-14 max-h-48"
+        ></textarea>
+        <div class="flex justify-between items-center px-2 pb-2">
+           <div class="flex gap-2">
+             <button class="p-2 text-[var(--muted-text)] hover:text-white rounded-lg hover:bg-[var(--dark-graphite)]">
+               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+               </svg>
+             </button>
+             <button class="p-2 text-[var(--muted-text)] hover:text-white rounded-lg hover:bg-[var(--dark-graphite)]">
+               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+               </svg>
+             </button>
+           </div>
+           <button (click)="sendMessage()" [disabled]="!userInput.trim() || isLoading" class="p-2 bg-[var(--neon-green)] text-black rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-green-400 transition-colors">
+             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+             </svg>
+           </button>
+        </div>
+      </div>
+      <p class="text-center text-xs text-[var(--muted-text)] mt-2">
+        Bonton AI Copilot can make mistakes. Consider checking important information.
+      </p>
+    </div>
+  </div>
+</div>

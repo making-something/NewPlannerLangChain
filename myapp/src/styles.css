@@ -1,0 +1,26 @@
+/* You can add global styles to this file, and also import other style files */
+
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-neon-green: #4EF068;
+  --color-deep-obsidian: #080808;
+  --color-dark-graphite: #1A1A1A;
+  --color-surface-grey: #262626;
+  --color-muted-text: #9CA3AF;
+}
+
+:root {
+  --neon-green: #4EF068;
+  --deep-obsidian: #080808;
+  --dark-graphite: #1A1A1A;
+  --surface-grey: #262626;
+  --muted-text: #9CA3AF;
+}
+
+body {
+  background-color: var(--dark-graphite);
+  color: white;
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
