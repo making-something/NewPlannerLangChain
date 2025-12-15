@@ -40,8 +40,8 @@ export class ChatComponent implements OnInit {
   // Templates for the welcome screen
   templates = [
     { icon: '✈️', title: 'Plan a 3-day trip', desc: 'A 3-day trip to see the northern lights in Norway...' },
-    { icon: '💡', title: 'Ideas for a customer loyalty program', desc: 'Here are seven ideas for a customer loyalty...' },
-    { icon: '🎁', title: 'Help me pick', desc: 'Here are some gift ideas for your fishing-loving...' }
+    { icon: '💡', title: 'Help me find the best place for me ', desc: 'what are best places for a ...' },
+    { icon: '🎁', title: 'Help me pick', desc: 'Here are some ideas for ...' }
   ];
 
   constructor(private plannerService: PlannerService) {}
@@ -119,6 +119,13 @@ export class ChatComponent implements OnInit {
   }
 
   handleResponse(response: ItineraryResponse): void {
+    console.log('Received response:', response);
+    if (!response || !response.itinerary) {
+      console.error('Invalid response received');
+      this.handleError('Received empty response from server');
+      return;
+    }
+
     this.sessionId = response.session_id;
     this.messages.push({
       role: 'assistant',
@@ -138,6 +145,15 @@ export class ChatComponent implements OnInit {
 
   useTemplate(template: any): void {
     this.userInput = template.desc; // Or title + desc
+  }
+
+  copyToClipboard(text: string): void {
+    navigator.clipboard.writeText(text).then(() => {
+      // Optional: Show a toast or change icon temporarily
+      console.log('Copied to clipboard');
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+    });
   }
 
   scrollToBottom(): void {
