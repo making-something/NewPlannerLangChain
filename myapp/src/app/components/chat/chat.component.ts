@@ -1,8 +1,9 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PlannerService } from '../../services/planner.service';
 import { MarkdownPipe } from '../../pipes/markdown.pipe';
+import { Subscription } from 'rxjs';
 import { 
   ItineraryRequest, 
   ItineraryResponse, 
@@ -25,7 +26,7 @@ interface Message {
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css'
 })
-export class ChatComponent implements OnInit {
+export class ChatComponent implements OnInit, OnDestroy {
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
 
   providers: ProviderInfo[] = [];
@@ -36,6 +37,7 @@ export class ChatComponent implements OnInit {
   messages: Message[] = [];
   isLoading: boolean = false;
   sessionId: string | null = null;
+  private resetSubscription: Subscription | undefined;
 
   // Templates for the welcome screen
   templates = [
@@ -48,6 +50,22 @@ export class ChatComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadModels();
+    this.resetSubscription = this.plannerService.resetChat$.subscribe(() => {
+      this.resetChat();
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.resetSubscription) {
+      this.resetSubscription.unsubscribe();
+    }
+  }
+
+  resetChat(): void {
+    this.messages = [];
+    this.sessionId = null;
+    this.userInput = '';
+    this.isLoading = false;
   }
 
   loadModels(): void {
@@ -81,6 +99,18 @@ export class ChatComponent implements OnInit {
     if (provider && provider.models.length > 0) {
       this.selectedModel = provider.models[0].id;
     }
+    this.updateBackendConfig();
+  }
+
+  onModelChange(): void {
+    this.updateBackendConfig();
+  }
+
+  updateBackendConfig(): void {
+    this.plannerService.updateConfig(this.selectedProvider, this.selectedModel).subscribe({
+      next: (res) => console.log('Config updated:', res),
+      error: (err) => console.error('Failed to update config:', err)
+    });
   }
 
   sendMessage(): void {

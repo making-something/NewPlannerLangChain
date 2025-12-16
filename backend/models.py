@@ -157,3 +157,10 @@ class ErrorResponse(BaseModel):
                 "detail": "CEREBRAS_API_KEY not found in environment variables"
             }
         }
+
+
+class ConfigUpdateRequest(BaseModel):
+    """Request model for updating configuration."""
+    provider: str = Field(..., description="Default provider to set")
+    model: str = Field(..., description="Default model to set")
+

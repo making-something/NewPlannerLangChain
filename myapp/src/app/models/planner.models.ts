@@ -57,3 +57,8 @@ export interface ErrorResponse {
   error: string;
   detail?: string;
 }
+
+export interface ConfigUpdateRequest {
+  provider: string;
+  model: string;
+}

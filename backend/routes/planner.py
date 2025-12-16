@@ -11,9 +11,11 @@ from models import (
     SaveItineraryRequest,
     SaveItineraryResponse,
     ErrorResponse,
-    ModelsResponse
+    ModelsResponse,
+    ConfigUpdateRequest
 )
 from services.llm_service import LLMService
+import os
 
 router = APIRouter(prefix="/api/v1/planner", tags=["Holiday Planner"])
 
@@ -242,3 +244,48 @@ async def delete_session(session_id: str):
     
     del sessions[session_id]
     return {"message": f"Session '{session_id}' deleted successfully"}
+
+
+@router.post("/config/model")
+async def update_model_config(request: ConfigUpdateRequest):
+    """Update the default model configuration in .env file."""
+    try:
+        # Go up 3 levels from routes/planner.py to reach root (NewPlanner)
+        env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), '.env')
+        
+        # Read current .env content
+        if os.path.exists(env_path):
+            with open(env_path, 'r') as f:
+                lines = f.readlines()
+        else:
+            lines = []
+        
+        # Update or add variables
+        new_lines = []
+        provider_updated = False
+        model_updated = False
+        
+        for line in lines:
+            if line.startswith('DEFAULT_PROVIDER='):
+                new_lines.append(f'DEFAULT_PROVIDER={request.provider}\n')
+                provider_updated = True
+            elif line.startswith('DEFAULT_MODEL='):
+                new_lines.append(f'DEFAULT_MODEL={request.model}\n')
+                model_updated = True
+            else:
+                new_lines.append(line)
+        
+        if not provider_updated:
+            new_lines.append(f'DEFAULT_PROVIDER={request.provider}\n')
+        if not model_updated:
+            new_lines.append(f'DEFAULT_MODEL={request.model}\n')
+            
+        # Write back to .env
+        with open(env_path, 'w') as f:
+            f.writelines(new_lines)
+            
+        return {"status": "success", "message": "Configuration updated successfully"}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating configuration: {str(e)}")
+

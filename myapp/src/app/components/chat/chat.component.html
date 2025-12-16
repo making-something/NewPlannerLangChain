@@ -6,7 +6,7 @@
        <option *ngFor="let p of providers" [value]="p.provider">{{ p.name }}</option>
      </select>
      <!-- Model Selector -->
-     <select [(ngModel)]="selectedModel" class="bg-[var(--surface-grey)] text-white text-sm rounded-lg px-3 py-1 border border-[var(--deep-obsidian)] focus:outline-none focus:border-[var(--neon-green)]">
+     <select [(ngModel)]="selectedModel" (change)="onModelChange()" class="bg-[var(--surface-grey)] text-white text-sm rounded-lg px-3 py-1 border border-[var(--deep-obsidian)] focus:outline-none focus:border-[var(--neon-green)]">
        <option *ngFor="let m of currentModels" [value]="m.id">{{ m.name }}</option>
      </select>
   </div>

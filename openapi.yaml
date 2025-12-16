@@ -146,6 +146,39 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /api/v1/planner/config/model:
+    post:
+      tags:
+        - Holiday Planner
+      summary: Update default model configuration
+      description: Update the default AI provider and model in the backend .env file.
+      operationId: updateModelConfig
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfigUpdateRequest'
+      responses:
+        '200':
+          description: Configuration updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Configuration updated successfully
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /api/v1/planner/sessions/{session_id}:
     get:
       tags:
@@ -372,3 +405,15 @@ components:
         detail:
           type: string
           example: CEREBRAS_API_KEY not found in environment variables
+    ConfigUpdateRequest:
+      type: object
+      required:
+        - provider
+        - model
+      properties:
+        provider:
+          type: string
+          example: cerebras
+        model:
+          type: string
+          example: llama-3.3-70b
