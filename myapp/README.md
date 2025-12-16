@@ -1,59 +1,94 @@
-# Myapp
+# 🌐 Myapp – AI Holiday Planner Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.3.
+This is the Angular 18+ frontend for the AI Holiday Planner project. It provides a modern, responsive chat UI for generating, refining, and saving detailed travel itineraries using LLMs (Cerebras, OpenAI, Groq, and more).
 
-## Development server
+---
 
-To start a local development server, run:
+## ✨ Features
 
-```bash
-ng serve
-```
+- **Chatbot UI:** Clean, dark-themed chat interface with sidebar for chat history and quick templates.
+- **Model Selection:** Instantly switch between LLM providers and models from the top bar.
+- **Markdown Rendering:** Beautiful, clickable itineraries with Google Search links, headings, and tips.
+- **Copy Tool:** Copy any AI response with a single click.
+- **Session Management:** Start new chats, view and delete sessions.
+- **Extensive Prompts:** Get highly detailed, actionable itineraries in a single response.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
+## 🚀 Getting Started
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### 1. Install Dependencies
 
 ```bash
-ng generate --help
+npm install
 ```
 
-## Building
-
-To build the project run:
+### 2. Start the Development Server
 
 ```bash
-ng build
+npm start
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Visit [http://localhost:4200](http://localhost:4200) in your browser.
 
-## Running unit tests
+---
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## 🖥️ UI Overview
 
-```bash
-ng test
+- **Sidebar:**
+  - Chat history, quick templates, and "New Chat" button
+- **Top Bar:**
+  - Provider/model dropdowns (syncs with backend)
+- **Chat Area:**
+  - User and AI messages, markdown rendering, copy tool
+
+![Chat UI Screenshot](../docs/chat-ui.png)
+
+---
+
+## 🛠️ Code Structure
+
+```
+myapp/
+├── src/
+│   └── app/
+│       ├── components/
+│       │   ├── chat/         # Chat UI logic
+│       │   └── sidebar/      # Sidebar and chat list
+│       ├── services/         # API communication
+│       ├── models/           # TypeScript models
+│       └── pipes/            # Markdown rendering
+└── ...
 ```
 
-## Running end-to-end tests
+---
 
-For end-to-end (e2e) testing, run:
+## 🧑‍💻 Technologies Used
 
-```bash
-ng e2e
-```
+- **Angular 18+**
+- **Tailwind CSS** (with typography plugin)
+- **RxJS**
+- **marked.js** (Markdown rendering)
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+---
 
-## Additional Resources
+## 📸 Visuals
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+> ![Sidebar and Chat Example](../docs/sidebar-example.png)
+> *Sidebar with chat history, model selection, and new chat button.*
+>
+> ![Markdown Rendering Example](../docs/markdown-example.png)
+> *Itinerary with headings, links, and copy tool.*
+
+---
+
+## 📚 Additional Resources
+
+- [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli)
+- [Project OpenAPI Spec](../openapi.yaml)
+
+---
+
+## 📝 License
+
+MIT

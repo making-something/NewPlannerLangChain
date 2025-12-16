@@ -1,149 +1,129 @@
-# AI Holiday Planner
+# 🌴 AI Holiday Planner
 
-An intelligent holiday planning application powered by Cerebras LLM with a FastAPI backend.
+An intelligent, full-stack holiday planning application powered by FastAPI, Angular, and LLMs (Cerebras, OpenAI, Groq, and more). Effortlessly generate, refine, and save detailed travel itineraries with a beautiful, modern UI.
 
-## Project Structure
+---
+
+## 🗂️ Project Structure
 
 ```
 NewPlanner/
-├── backend/
+├── backend/                # FastAPI backend (API, LLM integration, session management)
 │   ├── routes/
-│   │   ├── __init__.py
-│   │   └── planner.py          # Holiday planner endpoints
+│   │   └── planner.py      # Main API endpoints
 │   ├── services/
-│   │   ├── __init__.py
-│   │   └── llm_service.py      # Cerebras LLM service
-│   ├── main.py                  # FastAPI application entry point
-│   ├── models.py                # Pydantic request/response models
-│   └── requirements.txt          # Backend dependencies
-├── main.py                       # CLI version of the planner
-├── openapi.yaml                  # OpenAPI specification
-├── .gitignore
-└── README.md
+│   │   └── llm_service.py  # LLM provider logic (Cerebras, OpenAI, Groq)
+│   ├── main.py             # FastAPI app entry point
+│   ├── models.py           # Pydantic models
+│   └── requirements.txt    # Backend dependencies
+├── myapp/                  # Angular 18+ frontend (chat UI, markdown rendering)
+│   ├── src/
+│   │   └── app/
+│   │       ├── components/ # Chat, sidebar, etc.
+│   │       ├── services/   # API communication
+│   │       └── models/     # TypeScript models
+│   └── ...
+├── openapi.yaml            # OpenAPI 3.0 spec (API docs)
+├── .env                    # Environment variables
+└── README.md               # This file
 ```
 
-## Setup Instructions
+---
 
-### 1. Create Virtual Environment
+## 🚀 Quickstart
 
+### 1. Backend Setup
 ```bash
 python -m venv .venv
-.venv\Scripts\activate
-```
-
-### 2. Install Backend Dependencies
-
-```bash
+.venv\Scripts\activate  # On Windows
 cd backend
 pip install -r requirements.txt
-cd ..
 ```
 
-### 3. Set Environment Variables
-
-Create a `.env` file in the project root:
-
-```
-CEREBRAS_API_KEY=your_api_key_here
-```
-
-### 4. Run the Backend Server
-
+### 2. Frontend Setup
 ```bash
-cd backend
-python -m uvicorn main:app --reload
+cd myapp
+npm install
 ```
 
-The API will be available at `http://localhost:8000`
-
-### 5. Access API Documentation
-
-- **Swagger UI**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
-- **OpenAPI YAML**: http://localhost:8000/openapi.json
-
-## API Endpoints
-
-### Generate Itinerary
-**POST** `/api/v1/planner/generate`
-
-Create a new personalized itinerary based on user description.
-
-**Request:**
-```json
-{
-  "description": "I want a 7-day tropical vacation in Bali with a moderate budget..."
-}
+### 3. Environment Variables
+Create a `.env` in the project root:
+```
+CEREBRAS_API_KEY=your_cerebras_key
+OPENAI_API_KEY=your_openai_key
+GROQ_API_KEY=your_groq_key
+DEFAULT_PROVIDER=cerebras
+DEFAULT_MODEL=llama-3.3-70b
 ```
 
-**Response:**
-```json
-{
-  "session_id": "uuid-string",
-  "itinerary": "# 7-Day Bali Itinerary\n...",
-  "follow_up_questions": [
-    {
-      "question": "Would you prefer beachfront or jungle accommodations?",
-      "order": 1
-    }
-  ]
-}
-```
+### 4. Run the App
+- **Backend:**
+  ```bash
+  cd backend
+  uvicorn main:app --reload
+  ```
+- **Frontend:**
+  ```bash
+  cd myapp
+  npm start
+  ```
 
-### Refine Itinerary
-**POST** `/api/v1/planner/refine`
+---
 
-Refine an existing itinerary based on feedback.
+## 🖥️ Features & UI
 
-**Request:**
-```json
-{
-  "session_id": "uuid-string",
-  "feedback": "I prefer more adventure activities..."
-}
-```
+- **Chatbot UI:** Modern, responsive chat interface with sidebar for chat history and quick templates.
+- **Model Selection:** Switch between LLM providers (Cerebras, OpenAI, Groq) and models from the frontend.
+- **Markdown Rendering:** Beautiful, clickable itineraries with Google Search links, headings, and tips.
+- **Copy Tool:** Instantly copy any AI response with a single click.
+- **Session Management:** Start new chats, view and delete sessions.
+- **Extensive Prompts:** Get highly detailed, actionable itineraries in a single response.
 
-### Save Itinerary
-**POST** `/api/v1/planner/save`
+![Chat UI Screenshot](docs/chat-ui.png)
 
-Save the current itinerary to a file.
+---
 
-**Request:**
-```json
-{
-  "session_id": "uuid-string",
-  "filename": "bali_trip"
-}
-```
+## 🛠️ API Endpoints (OpenAPI)
 
-### Get Session
-**GET** `/api/v1/planner/sessions/{session_id}`
+See [`openapi.yaml`](openapi.yaml) for full details. Key endpoints:
 
-Retrieve the current state of a session.
+| Endpoint                                 | Method | Description                                 |
+|------------------------------------------|--------|---------------------------------------------|
+| `/api/v1/planner/models`                 | GET    | List available LLM providers/models          |
+| `/api/v1/planner/generate`               | POST   | Generate a new itinerary                    |
+| `/api/v1/planner/refine`                 | POST   | Refine an existing itinerary                |
+| `/api/v1/planner/save`                   | POST   | Save itinerary to file                      |
+| `/api/v1/planner/sessions/{session_id}`  | GET    | Get session state                           |
+| `/api/v1/planner/sessions/{session_id}`  | DELETE | Delete a session                            |
+| `/api/v1/planner/config/model`           | POST   | Update default provider/model in backend     |
 
-### Delete Session
-**DELETE** `/api/v1/planner/sessions/{session_id}`
+---
 
-Delete a session and its data.
+## 🧑‍💻 Technologies Used
 
-## CLI Usage
+- **Backend:** FastAPI, Pydantic, LangChain, Uvicorn
+- **Frontend:** Angular 18+, Tailwind CSS, RxJS, marked.js
+- **LLMs:** Cerebras, OpenAI, Groq (pluggable)
+- **Other:** Markdown rendering, Google Search links, session management
 
-To use the standalone CLI version:
+---
 
-```bash
-python main.py
-```
-
-Follow the prompts to create and refine your holiday itinerary.
-
-## Technologies Used
-
-- **FastAPI**: Modern web framework for building APIs
-- **Pydantic**: Data validation using Python type annotations
-- **Cerebras**: LLM provider for itinerary generation
-- **Uvicorn**: ASGI server for running FastAPI
-- **LangChain**: Framework for working with LLMs
-
-## License
+## 📄 License
 
 MIT
+
+---
+
+## ✨ Screenshots
+
+> ![Sidebar and Chat Example](docs/sidebar-example.png)
+> *Sidebar with chat history, model selection, and new chat button.*
+
+> ![Markdown Rendering Example](docs/markdown-example.png)
+> *Itinerary with headings, links, and copy tool.*
+
+---
+
+## 🤝 Contributing
+
+Pull requests and issues are welcome! Please see the [OpenAPI spec](openapi.yaml) and code comments for guidance.
