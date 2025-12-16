@@ -7,8 +7,6 @@ An intelligent holiday planning application powered by Cerebras LLM with a FastA
 ```
 NewPlanner/
 ├── backend/
-
-
 │   ├── routes/
 │   │   ├── __init__.py
 │   │   └── planner.py          # Holiday planner endpoints
